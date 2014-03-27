@@ -15,9 +15,10 @@ from scrapy.http import FormRequest
 
 class Scispider(Spider):
     name = 'sci'
+    sid = '3FbmXFcQo6QTqXitgBF'
     start_urls =  [
-    'http://apps.webofknowledge.com/WOS_GeneralSearch_input.do?product=WOS&SID=1CZkm6z9VnZxLMnSDVX&search_mode=GeneralSearch']
-    
+    'http://apps.webofknowledge.com/WOS_GeneralSearch_input.do?product=WOS&SID=%s&search_mode=GeneralSearch' % sid]
+
     def parse(self,response):
         sel = Selector(response)
         print '*********************',sel.xpath('//title/text()').extract(),'***********************'
@@ -26,7 +27,7 @@ class Scispider(Spider):
        # url="http://apps.webofknowledge.com/WOS_GeneralSearch_input.do?product=WOS&SID=1CZkm6z9VnZxLMnSDVX&search_mode=GeneralSearch",
         url = "http://apps.webofknowledge.com/WOS_GeneralSearch.do",
         formdata = {
-            'SID':'1CZkm6z9VnZxLMnSDVX',
+            'SID':self.sid,
             'action':'search',
             'editions':'SCI',
             'endYear':'2014',
@@ -36,7 +37,7 @@ class Scispider(Spider):
             'period':'Year Range',
             'product':'WOS',
             'range':'ALL',
-            'sa_params':"WOS||1CZkm6z9VnZxLMnSDVX|http://apps.webofknowledge.com|",
+            'sa_params':"WOS||%s|http://apps.webofknowledge.com|" % self.sid,
             'search_mode':'GeneralSearch',
             'ssStatus':'display:none',
             'ss_lemmatization':'On',
