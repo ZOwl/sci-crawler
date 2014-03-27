@@ -54,5 +54,4 @@ class Scispider(Spider):
         print '22222*****'
         #print sel.xpath("//div[@class='search-results']").extract()
         print sel.xpath("//title/text()").extract()
-        
 

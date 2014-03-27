@@ -13,3 +13,15 @@ NEWSPIDER_MODULE = 'scicrawler.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'scicrawler (+http://www.yourdomain.com)'
+USER_AGENT = 'Mozilla/5.0 (compatible; iaskspider/1.0; MSIE 9.0)'
+
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': 400,
+    'scrapy.contrib.downloadermiddleware.cookies.CookiesMiddleware': 700,
+}
+
+DOWNLOAD_DELAY = 0.25
+RANDOMIZE_DOWNLOAD_DELAY = True
+
+COOKIES_ENABLED = True
+COOKIES_DEBUG = True
