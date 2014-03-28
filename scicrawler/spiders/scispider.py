@@ -11,12 +11,14 @@ from scrapy.spider import Spider
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.selector import Selector,HtmlXPathSelector
 from scrapy.item import Item
-from scrapy.http import FormRequest
+from scrapy.http import FormRequest,Request
+from scicrawler.items import SciItem
 
 class Scispider(Spider):
     name = 'sci'
-    sid = '3B5NXihtZmdiwQD5IPw'
+    sid = '1E2s2lMeBBoGSluX49t'
     start_urls =  ['http://apps.webofknowledge.com/WOS_GeneralSearch_input.do?product=WOS&SID=%s&search_mode=GeneralSearch' % sid]
+    #start_urls = ['file:///home/geraldyan/Documents/search-results.html']
 
     def parse(self,response):
         sel = Selector(response)
@@ -24,7 +26,7 @@ class Scispider(Spider):
 
         return  FormRequest(url = "http://apps.webofknowledge.com/WOS_GeneralSearch.do",
         formdata = {
-            'SID':'3B5NXihtZmdiwQD5IPw',
+            'SID':self.sid,
             'action':'search',
             'editions':['SCI','SSCI','ISTP','ISSHP'],
             'endYear':'2014',
@@ -47,11 +49,52 @@ class Scispider(Spider):
     def after_post(self,response):
         sel = Selector(response)
         print '*********************after post*****************************'
-        print sel.xpath("//title/text()").extract()
+        page_count = int(sel.xpath("//span[@id='pageCount.bottom']/text()").extract()[0])
         items = sel.xpath("//div[starts-with(@id,'RECORD_')]")
+        data = []
         for item in items:
             temp = item.xpath(".//a[starts-with(@href,'/full_record')]")
             title = temp.xpath("./value/text()").extract()
-            print title[0]
             link = temp.xpath("./@href").extract()
-            print link[0]
+
+            blank = SciItem()
+            blank['title'] = title[0]
+            blank['link'] = 'http://apps.webofknowledge.com'+link[0]
+            data.append(blank)
+
+        for item in data:
+            yield Request(url = item['link'],callback=self.detail)
+
+
+    def detail(self,response):
+        sel = Selector(response)
+
+        title = sel.xpath("//div[@class='title']/value/text()").extract()[0]
+
+        record_blocks = sel.xpath("//div[starts-with(@class,'block-record-info')]")
+        #get Authors
+        by_ext = record_blocks[0].xpath(".//p[@class='FR_field']/text()").extract()
+        del by_ext[0]
+        by = ''
+        for s in by_ext:
+            by += s
+        #get Journal
+        jou_ext = record_blocks[1].xpath(".//*/text()").extract()
+        journal = ''
+        for s in jou_ext:
+            if s == 'View Journal Information':
+                break
+            journal += s
+        journal = journal.replace('\n\n','linefeed')
+        journal = journal.replace('\n',' ')
+        journal = journal.replace('linefeed','\n')
+
+        f = open("data.txt",'a')
+        f.write(title)
+        f.write(journal)
+        f.write('&&&\n\n&&&')
+
+
+
+
+

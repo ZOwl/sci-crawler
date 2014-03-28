@@ -9,3 +9,15 @@ class ScicrawlerItem(Item):
     # define the fields for your item here like:
     # name = Field()
     pass
+
+class SciItem(Item):
+    title = Field()
+    link = Field()
+
+class PaperItem(Item):
+    title = Field()
+    by = Field()
+    journal = Field()
+    volume = Field()
+    pages = Field()
+    published = Field()
