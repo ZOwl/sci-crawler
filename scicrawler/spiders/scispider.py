@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # -*- coding: utf-8 -*-
 
 """
@@ -16,9 +16,10 @@ from scicrawler.items import SciItem
 
 class Scispider(Spider):
     name = 'sci'
-    sid = '1E2s2lMeBBoGSluX49t'
+    sid = '3CJD5w2sc59r712zMpP'
     start_urls =  ['http://apps.webofknowledge.com/WOS_GeneralSearch_input.do?product=WOS&SID=%s&search_mode=GeneralSearch' % sid]
     #start_urls = ['file:///home/geraldyan/Documents/search-results.html']
+    papers = []
 
     def parse(self,response):
         sel = Selector(response)
@@ -51,7 +52,7 @@ class Scispider(Spider):
         print '*********************after post*****************************'
         page_count = int(sel.xpath("//span[@id='pageCount.bottom']/text()").extract()[0])
         items = sel.xpath("//div[starts-with(@id,'RECORD_')]")
-        data = []
+
         for item in items:
             temp = item.xpath(".//a[starts-with(@href,'/full_record')]")
             title = temp.xpath("./value/text()").extract()
@@ -60,11 +61,29 @@ class Scispider(Spider):
             blank = SciItem()
             blank['title'] = title[0]
             blank['link'] = 'http://apps.webofknowledge.com'+link[0]
-            data.append(blank)
+            self.papers.append(blank)
 
-        for item in data:
+        for i in range(2,page_count+1):
+            yield Request(url = "http://apps.webofknowledge.com/summary.do?product=WOS&parentProduct=WOS&search_mode=GeneralSearch&parentQid=&qid=2&SID=%s&&page=%d" % (self.sid,i),callback = self.pages)    
+
+
+    def pages(self,response):
+        sel = Selector(response)
+        items = sel.xpath("//div[starts-with(@id,'RECORD_')]")
+        
+        for item in items:
+            temp = item.xpath(".//a[starts-with(@href,'/full_record')]")
+            title = temp.xpath("./value/text()").extract()
+            link = temp.xpath("./@href").extract()
+
+            blank = SciItem()
+            blank['title'] = title[0]
+            blank['link'] = 'http://apps.webofknowledge.com'+link[0]
+            self.papers.append(blank)
+
+        for item in self.papers:
             yield Request(url = item['link'],callback=self.detail)
-
+        del self.papers[:]
 
     def detail(self,response):
         sel = Selector(response)
@@ -93,6 +112,7 @@ class Scispider(Spider):
         f.write(title)
         f.write(journal)
         f.write('&&&\n\n&&&')
+        f.close()
 
 
 
