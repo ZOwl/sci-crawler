@@ -16,12 +16,20 @@ from scicrawler.items import SciItem
 
 class Scispider(Spider):
     name = 'sci'
-    sid = '3CJD5w2sc59r712zMpP'
-    start_urls =  ['http://apps.webofknowledge.com/WOS_GeneralSearch_input.do?product=WOS&SID=%s&search_mode=GeneralSearch' % sid]
-    #start_urls = ['file:///home/geraldyan/Documents/search-results.html']
+    sid = ''
     papers = []
+    start_urls = ['http://www.webofknowledge.com/?&Error=Client.NullSessionID']
 
     def parse(self,response):
+        print '************Start**************'
+        url = response.url
+        i = url.find('SID=')
+        self.sid = url[i+4:i+23]
+        yield Request( url =
+        'http://apps.webofknowledge.com/WOS_GeneralSearch_input.do?product=WOS&SID=%s&search_mode=GeneralSearch'
+        % self.sid,callback=self.post_search)
+
+    def post_search(self,response):
         sel = Selector(response)
         print '*********************',sel.xpath('//title/text()').extract(),'***********************'
 
@@ -63,8 +71,17 @@ class Scispider(Spider):
             blank['link'] = 'http://apps.webofknowledge.com'+link[0]
             self.papers.append(blank)
 
+        if page_count > 1:
+            next_url = sel.xpath("//a[@class='paginationNext']/@href").extract()[0]
+            i = next_url.find('SID=')
+            next_url = next_url[:i+4] + self.sid + '&&page='
+        elif page_count == 1:
+            for item in self.papers:
+                yield Request(url = item['link'],callback=self.detail)
+
         for i in range(2,page_count+1):
-            yield Request(url = "http://apps.webofknowledge.com/summary.do?product=WOS&parentProduct=WOS&search_mode=GeneralSearch&parentQid=&qid=2&SID=%s&&page=%d" % (self.sid,i),callback = self.pages)    
+            nextpage = next_url+str(i)
+            yield Request(url = nextpage,callback=self.pages)
 
 
     def pages(self,response):
