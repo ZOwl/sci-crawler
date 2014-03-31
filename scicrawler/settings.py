@@ -27,3 +27,4 @@ RANDOMIZE_DOWNLOAD_DELAY = True
 COOKIES_ENABLED = True
 COOKIES_DEBUG = True
 '''
+ITEM_PIPELINES = {'scicrawler.pipelines.CSVPipeline': 300 }

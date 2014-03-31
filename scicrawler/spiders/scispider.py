@@ -12,7 +12,7 @@ from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.selector import Selector,HtmlXPathSelector
 from scrapy.item import Item
 from scrapy.http import FormRequest,Request
-from scicrawler.items import SciItem
+from scicrawler.items import SciItem,PaperItem
 
 class Scispider(Spider):
     name = 'sci'
@@ -66,7 +66,7 @@ class Scispider(Spider):
             title = temp.xpath("./value/text()").extract()
             link = temp.xpath("./@href").extract()
 
-            blank = SciItem()
+            blank = {} 
             blank['title'] = title[0]
             blank['link'] = 'http://apps.webofknowledge.com'+link[0]
             self.papers.append(blank)
@@ -125,13 +125,10 @@ class Scispider(Spider):
         journal = journal.replace('\n',' ')
         journal = journal.replace('linefeed','\n')
 
-        f = open("data.txt",'a')
-        f.write(title)
-        f.write(journal)
-        f.write('&&&\n\n&&&')
-        f.close()
-
-
-
+        item = PaperItem()
+        item['title'] = title
+        item['journal'] = journal
+        item['by'] = by
+        return item
 
 

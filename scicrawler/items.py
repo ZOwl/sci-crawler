@@ -15,9 +15,6 @@ class SciItem(Item):
     link = Field()
 
 class PaperItem(Item):
-    title = Field()
-    by = Field()
     journal = Field()
-    volume = Field()
-    pages = Field()
-    published = Field()
+    by = Field()
+    title = Field()
