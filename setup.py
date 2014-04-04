@@ -1,17 +1,10 @@
-#!/usr/bin/env python
+# Automatically created by: scrapyd-deploy
 
 from setuptools import setup, find_packages
 
 setup(
-    name='sci-crawler',
-    version='0.0.1',
-    author='ZOwl',
-    author_email='zhhbug@gmail.com',
-    license='LICENSE.txt',
-    description='sci-crawler',
-    test_suite='tests',
-    packages=find_packages(exclude=['tests']),
-    install_requires=[
-       "scrapy",
-    ]
+    name         = 'project',
+    version      = '1.0',
+    packages     = find_packages(),
+    entry_points = {'scrapy': ['settings = scicrawler.settings']},
 )

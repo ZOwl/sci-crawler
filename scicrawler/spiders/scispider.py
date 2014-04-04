@@ -14,11 +14,15 @@ from scrapy.item import Item
 from scrapy.http import FormRequest,Request
 from scicrawler.items import SciItem,PaperItem
 
-class Scispider(Spider):
+class SciSpider(Spider):
     name = 'sci'
     sid = ''
     papers = []
     start_urls = ['http://www.webofknowledge.com/?&Error=Client.NullSessionID']
+
+    def __init__(self,**kwargs):
+        super(SciSpider,self).__init__(**kwargs)
+        self.author = kwargs['author']
 
     def parse(self,response):
         print '************Start**************'
@@ -50,7 +54,7 @@ class Scispider(Spider):
             'ssStatus':'display:none',
             'ss_lemmatization':'On',
             'startYear':'2011',
-            'value(input1)':'Sheng XQ',
+            'value(input1)':self.author,
             'value(select1)':'AU'},
             callback = self.after_post)
 

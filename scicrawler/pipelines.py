@@ -3,9 +3,6 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-class ScicrawlerPipeline(object):
-    def process_item(self, item, spider):
-        return item
 from scrapy import signals
 from scrapy.contrib.exporter import CsvItemExporter
 
@@ -22,8 +19,10 @@ class CSVPipeline(object):
     return pipeline
 
   def spider_opened(self, spider):
-    #file = open('%s_items.csv' % spider.name, 'w+b')
-    file = open('data.csv','w+b')
+    author = spider.author
+    author = filter(str.isalpha,author)
+    file = open('%s.csv' % author, 'w+b')
+    #file = open('data.csv','w+b')
     self.files[spider] = file
     self.exporter = CsvItemExporter(file)
     self.exporter.fields_to_export = ['title','by','journal']
