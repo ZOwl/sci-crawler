@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 """
@@ -23,6 +22,8 @@ class SciSpider(Spider):
     def __init__(self,**kwargs):
         super(SciSpider,self).__init__(**kwargs)
         self.author = kwargs['author']
+        self.startYear = kwargs['startYear']
+        self.endYear = kwargs['endYear']
 
     def parse(self,response):
         print '************Start**************'
@@ -42,7 +43,7 @@ class SciSpider(Spider):
             'SID':self.sid,
             'action':'search',
             'editions':['SCI','SSCI','ISTP','ISSHP'],
-            'endYear':'2014',
+            'endYear':self.endYear,
             'fieldCount':'1',
             'limitStatus':'expanded',
             'max_field_count':'25',
@@ -53,7 +54,7 @@ class SciSpider(Spider):
             'search_mode':'GeneralSearch',
             'ssStatus':'display:none',
             'ss_lemmatization':'On',
-            'startYear':'2011',
+            'startYear':self.startYear,
             'value(input1)':self.author,
             'value(select1)':'AU'},
             callback = self.after_post)
